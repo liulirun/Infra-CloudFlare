@@ -1,0 +1,1 @@
+.\cf-terraforming.exe --version
