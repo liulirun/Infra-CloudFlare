@@ -1,5 +1,8 @@
 cmd.md
-.terraform/providers/registry.terraform.io/cloudflare/cloudflare/4.36.0/windows_amd64/CHANGELOG.md
-.terraform/providers/registry.terraform.io/cloudflare/cloudflare/4.36.0/windows_amd64/LICENSE
-.terraform/providers/registry.terraform.io/cloudflare/cloudflare/4.36.0/windows_amd64/terraform-provider-cloudflare_v4.36.0.exe
+.terraform/*
 run.ps1
+generate.ps1
+import.ps1
+secret.tfvars
+terraform.tfstate
+terraform.tfstate.backup
