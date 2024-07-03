@@ -6,3 +6,4 @@ import.ps1
 secret.tfvars
 terraform.tfstate
 terraform.tfstate.backup
+plan
