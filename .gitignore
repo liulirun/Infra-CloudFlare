@@ -7,3 +7,4 @@ secret.tfvars
 terraform.tfstate
 terraform.tfstate.backup
 plan
+tfplan
