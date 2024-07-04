@@ -1,18 +1,3 @@
-terraform {
-  required_providers {
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
-}
-
-# ## IMPORTATNT! below is needed for terraform plan, but you do not need this before terraform plan
-# ## should change to a module
 resource "cloudflare_ruleset" "terraform_managed_resource_a588c52133e243ee928d5e4566be3301" {
   kind    = "zone"
   name    = "default"
@@ -44,3 +29,4 @@ resource "cloudflare_ruleset" "terraform_managed_resource_9236776f6d3c4e41a3f70d
     expression  = "(ip.geoip.country eq \"AF\")"
   }
 }
+
