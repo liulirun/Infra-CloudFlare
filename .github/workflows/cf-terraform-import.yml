@@ -1,4 +1,4 @@
-name: "Cf-Terraforming Generate"
+name: "Cf-terraforming Import"
 
 on:
   push:
@@ -20,13 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: debug
-      #   run: |
-      #     echo "Get CPU info"
-      #     cat /proc/cpuinfo
-      #     echo $(ls ${{ github.workspace }} -la)
-      #     echo $(ls ${{ github.workspace }} -la | grep cf-terraforming)
-
       - name: download-cf-terraforming
         run: |
           if [ ! -e "/${{ github.workspace }}/cf-terraforming" ]; then
@@ -44,20 +37,20 @@ jobs:
         run: |
           terraform fmt -check && terraform init && terraform validate
 
-      - name: cf-terraforming generate
+      - name: Cf-terraforming Import
         env:
           CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
           ZONE_IDS: ${{ env.ZONE_IDS }}
           CI : false
-        run: |
+        run: |        
           echo "$ZONE_IDS" | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key value; do
-            ./cf-terraforming generate -t $CLOUDFLARE_TOKEN -z $value --resource-type cloudflare_ruleset -v > imported_ruleset_$key.tf
+            ./cf-terraforming import -t $CLOUDFLARE_TOKEN -z $value --resource-type cloudflare_ruleset --modern-import-block > imported_cmd_$key.txt
           done
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ruleset
-          path: imported_ruleset_*.tf
+          name: import_cmd
+          path: imported_cmd_*.txt
 
       # Delete all existing files as we re-use the same runner
       - name: Delete all files
