@@ -1,4 +1,7 @@
-This PR is for cf-terraforming generating
-changes: 
-1. pass in api_token to pipeline
-2. upload the generated_tf to pipelile
+## cf-terraforming generating
+generate .tf files into archive
+put imported-*.tf in root module for cf-terraforming import
+
+
+## TODO
+terraform import: pass in token
