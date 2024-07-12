@@ -1,4 +1,4 @@
-name: "Cf-terraforming Import"
+name: "cf-terraforming"
 
 on:
   push:
@@ -12,11 +12,11 @@ env:
   ZONE_IDS: '{"lee-site": "8f0b8c4abfb8b870fce5c65aa7c3f0d7"}'
 
 jobs:
-  cf-terraforming-import:
+  cf-terraforming:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
+    # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -37,12 +37,27 @@ jobs:
         run: |
           terraform fmt -check && terraform init && terraform validate
 
-      - name: Cf-terraforming Import
+      - name: Cf-terraforming Generate
         env:
           CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
           ZONE_IDS: ${{ env.ZONE_IDS }}
           CI: false
         run: |
+          echo "$ZONE_IDS" | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key value; do
+            ./cf-terraforming generate -t $CLOUDFLARE_TOKEN -z $value --resource-type cloudflare_ruleset -v > generated_ruleset_$key.tf
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated_ruleset
+          path: generated_ruleset_*.tf
+
+      - name: Cf-terraforming Import
+        env:
+          CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
+          ZONE_IDS: ${{ env.ZONE_IDS }}
+          CI : false
+        run: |        
           echo "$ZONE_IDS" | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key value; do
             ./cf-terraforming import -t $CLOUDFLARE_TOKEN -z $value --resource-type cloudflare_ruleset --modern-import-block > imported_cmd_$key.txt
           done

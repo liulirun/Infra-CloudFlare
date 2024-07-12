@@ -36,9 +36,6 @@ jobs:
         run: |
           terraform fmt -check && terraform init && terraform validate
 
-# terraform import -var-file="secret.tfvars" cloudflare_ruleset.terraform_managed_resource_9236776f6d3c4e41a3f70dcf636a0df2 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/9236776f6d3c4e41a3f70dcf636a0df2
-# terraform import -var-file="secret.tfvars" cloudflare_ruleset.terraform_managed_resource_a588c52133e243ee928d5e4566be3301 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/a588c52133e243ee928d5e4566be3301
-
       - name: Terraform Import
         env:
           CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
