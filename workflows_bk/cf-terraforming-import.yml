@@ -12,11 +12,11 @@ env:
   ZONE_IDS: '{"lee-site": "8f0b8c4abfb8b870fce5c65aa7c3f0d7"}'
 
 jobs:
-  cf-terraforming-generate:
+  cf-terraforming-import:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
+      # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -41,8 +41,8 @@ jobs:
         env:
           CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
           ZONE_IDS: ${{ env.ZONE_IDS }}
-          CI : false
-        run: |        
+          CI: false
+        run: |
           echo "$ZONE_IDS" | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key value; do
             ./cf-terraforming import -t $CLOUDFLARE_TOKEN -z $value --resource-type cloudflare_ruleset --modern-import-block > imported_cmd_$key.txt
           done
