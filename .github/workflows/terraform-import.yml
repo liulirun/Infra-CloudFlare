@@ -1,0 +1,61 @@
+name: "Terraform Import"
+
+on:
+  push:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+
+jobs:
+  cf-terraforming-generate:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: download-cf-terraforming
+        run: |
+          if [ ! -e "/${{ github.workspace }}/cf-terraforming" ]; then
+              echo "cf-terraforming file does not exist."
+              gz_file="cf-terraforming.tar.gz"
+              curl -L https://github.com/cloudflare/cf-terraforming/releases/download/v0.20.0/cf-terraforming_0.20.0_linux_amd64.tar.gz -o ${{ github.workspace }}/$gz_file
+              tar -xzvf ${{ github.workspace }}/$gz_file -C ${{ github.workspace }}
+              rm ${{ github.workspace }}/$gz_file
+              chmod +x cf-terraforming
+          else
+              echo "File cf-terraforming already exists."
+          fi
+
+      - name: Terraform Init
+        run: |
+          terraform fmt -check && terraform init && terraform validate
+
+# terraform import -var-file="secret.tfvars" cloudflare_ruleset.terraform_managed_resource_9236776f6d3c4e41a3f70dcf636a0df2 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/9236776f6d3c4e41a3f70dcf636a0df2
+# terraform import -var-file="secret.tfvars" cloudflare_ruleset.terraform_managed_resource_a588c52133e243ee928d5e4566be3301 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/a588c52133e243ee928d5e4566be3301
+
+      - name: Terraform Import
+        env:
+          CLOUDFLARE_TOKEN: ${{ env.CLOUDFLARE_TOKEN }}
+        run: |
+          terraform import -var "cloudflare_api_token=$CLOUDFLARE_TOKEN" cloudflare_ruleset.terraform_managed_resource_9236776f6d3c4e41a3f70dcf636a0df2 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/9236776f6d3c4e41a3f70dcf636a0df2
+          terraform import -var "cloudflare_api_token=$CLOUDFLARE_TOKEN" cloudflare_ruleset.terraform_managed_resource_a588c52133e243ee928d5e4566be3301 zone/8f0b8c4abfb8b870fce5c65aa7c3f0d7/a588c52133e243ee928d5e4566be3301
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfstate
+          path: terraform.tfstate
+
+      - name: Debug
+        run: |
+          tail terraform.tfstate
+
+      # Delete all existing files as we re-use the same runner
+      - name: Delete all files
+        run: |
+          rm -rf ${{ github.workspace }}/*
