@@ -5,7 +5,7 @@ generate.ps1
 import.ps1
 secret.tfvars
 terraform.tfstate
-terraform.tfstate.backup
+terraform.tfstate.*
 plan
 tfplan
 cf-terraforming.exe
