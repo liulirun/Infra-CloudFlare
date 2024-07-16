@@ -2,6 +2,7 @@
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+  rps       = 3
 }
 
 module "lee-site-waf" {
